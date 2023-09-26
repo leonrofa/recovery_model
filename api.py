@@ -16,10 +16,11 @@ df.shape
 df.head()
 df.to_csv('activities.csv', index=False)
 
-response2 = requests.get(f'https://intervals.icu//api/v1/activity/{API_KEY}/fit-file/?oldest=2023-09-26&newest=2023-09-27', auth=HTTPBasicAuth(USERNAME, API_KEY))
+response2 = requests.get(f'https://intervals.icu/api/v1/activity/{API_KEY}/power-histogram/?id=i24340942', auth=HTTPBasicAuth(USERNAME, API_KEY))
 print(response.status_code)
-fitfile = response.json()
-df2 = pd.DataFrame(fitfile)
+power = response.json()
+df2 = pd.DataFrame(power)
 for col in df2.columns:
     print(col)
+
 
