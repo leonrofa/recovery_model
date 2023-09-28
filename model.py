@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf
 
+# import dataframe
 df = pd.read_csv('activities.csv', parse_dates=['start_date_local'])
 df.set_index('start_date_local', inplace=True)
 df.rename(columns={'icu_rpe':'rpe'}, inplace=True)
@@ -20,16 +21,22 @@ fig, ax = plt.subplots(figsize=(10,6))
 plot_acf(df['feel'], ax=ax, lags=50)
 plt.show()
 
-# seasonal plot by weekday, month
-df['weekday'] = df.index.dayofweek
-df['month'] = df.index.isocalendar().week
+# plot feel by day of week 
+df['week_year'] = df.index.isocalendar().week.astype(str) + '_' + df.index.year.astype(str)
+df['dayweek'] = df.index.weekday
 
-grouped_weekday = [df['feel'][df['weekday'] == day].values for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
-grouped_month = [df['feel'][df['month'] == month].values for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']]
+grouped = df.groupby(['week_year', 'dayweek'])['feel'].mean().unstack()
 
-fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
-ax1.boxplot(grouped_weekday, vert=True, patch_artist=True, labels=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])
-ax1.set_xlabel('Weekday')
-ax2.boxplot(grouped_month, vert=True, patch_artist=True, labels=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])
+plt.figure(figsize=(10,6))
+for week_year in grouped.index:
+    plt.plot(grouped.columns, grouped.loc[week_year], marker='o', markerfacecolor='none', color='C0', alpha=0.25)
+
+plt.xticks(grouped.columns, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+plt.title('Feel by day of week')
+plt.xlabel('Day of week')
+plt.ylabel('Feel (1: strong––5: weak)')
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
 plt.show()
+
+# no clear seasonal effect
