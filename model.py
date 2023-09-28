@@ -32,8 +32,7 @@ for week_year in grouped.index:
     plt.plot(grouped.columns, grouped.loc[week_year], marker='o', markerfacecolor='none', color='C0', alpha=0.25)
 
 plt.xticks(grouped.columns, ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
-plt.title('Feel by day of week')
-plt.xlabel('Day of week')
+plt.xlabel('Day of the week')
 plt.ylabel('Feel (1: strong––5: weak)')
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
