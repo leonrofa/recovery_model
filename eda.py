@@ -27,11 +27,9 @@ for col in numeric_cols:
 
     outliers[col] = df[(df[col] < lb) | (df[col] > ub)]
 
-q1 = numeric_cols.quantile(0.25)
-q3 = numeric_cols.quantile(0.75)
-iqr = q3 - q1
-
-outliers = df[((df < (q1-1.5*iqr)) | (df > (q3+1.5*iqr))).any(axis=1)]
+for col, outlier_df in outliers.items():
+    if not outlier_df.empty:
+        print(f"Outliers in column {col}:\n", outlier_df)
 
 # plot feel
 plt.figure(figsize=(10,2))
@@ -52,7 +50,7 @@ df['dayweek'] = df.index.weekday
 plt.figure(figsize=(10,6))
 for week_year in df['week_year'].unique():
     week_data = df[df['week_year'] == week_year].sort_values(by='dayweek')
-    plt.plot(week_data['dayweek'], week_data['feel'], grouped.loc[week_year], marker='o', markerfacecolor='none', color='C0', alpha=0.25)
+    plt.plot(week_data['dayweek'], week_data['feel'], marker='o', markerfacecolor='none', color='C0', alpha=0.25)
 
 plt.xticks(range(7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
 plt.xlabel('Day of the week')
