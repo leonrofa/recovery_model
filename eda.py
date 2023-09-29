@@ -9,8 +9,32 @@ df.set_index('start_date_local', inplace=True)
 df.rename(columns={'icu_rpe':'rpe'}, inplace=True)
 df.head()
 
+# check na's, duplicates
+print(df.isnull().sum())
+print(df[df.duplicated()])
+
+# identify outliers as defined by iqr 
+numeric_cols = df.select_dtypes(include=['number'])
+
+outliers = {}
+
+for col in numeric_cols:
+    q1 = df[col].quantile(0.25)
+    q3 = df[col].quantile(0.75)
+    iqr = q3 - q1
+    lb = q1-1.5*iqr
+    ub = q3+1.5*iqr
+
+    outliers[col] = df[(df[col] < lb) | (df[col] > ub)]
+
+q1 = numeric_cols.quantile(0.25)
+q3 = numeric_cols.quantile(0.75)
+iqr = q3 - q1
+
+outliers = df[((df < (q1-1.5*iqr)) | (df > (q3+1.5*iqr))).any(axis=1)]
+
 # plot feel
-plt.figure(figsize=(10,1))
+plt.figure(figsize=(10,2))
 plt.plot(df.index, df[['feel']])
 plt.grid(True)
 plt.tight_layout()
@@ -38,3 +62,4 @@ plt.tight_layout()
 plt.show()
 
 # no clear weekly effect
+
