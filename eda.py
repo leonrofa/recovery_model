@@ -38,10 +38,7 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# plot sample acf of feel
-fig, ax = plt.subplots(figsize=(10,6))
-plot_acf(df['feel'], ax=ax, lags=50)
-plt.show()
+# no trend, looks stationary
 
 # plot feel by day of week 
 df['week_year'] = df.index.isocalendar().week.astype(str) + '_' + df.index.year.astype(str)
@@ -54,12 +51,19 @@ for week_year in df['week_year'].unique():
 
 plt.xticks(range(7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
 plt.xlabel('Day of the week')
-plt.ylabel('Feel (1: strong––5: weak)')
+plt.ylabel('feel (1: strong––5: weak)')
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
 plt.show()
 
-# no clear weekly effect
+# no clear seasonal effect
+
+# plot sample acf of feel
+fig, ax = plt.subplots(figsize=(10,6))
+plot_acf(df['feel'], ax=ax, lags=50)
+plt.show()
+
+# some persistency in the time series
 
 # box plots of features
 features = ['feel', 'moving_time', 'rpe']
