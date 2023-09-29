@@ -61,3 +61,16 @@ plt.show()
 
 # no clear weekly effect
 
+# box plots of features
+features = ['feel', 'moving_time', 'rpe']
+
+fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15,6))
+for ax, feature in zip(axes, features):
+    ax.boxplot(df[feature], vert=True)
+    ax.set_title(feature)
+    ax.set_xticks([])
+
+fig.suptitle('Box-and-whisker plots of features (note: non-iid obs)')
+
+plt.tight_layout()
+plt.show()
