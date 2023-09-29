@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from scipy.stats import kendalltau
 
 # import dataframe
 df = pd.read_csv('activities.csv', parse_dates=['start_date_local'])
@@ -58,23 +59,42 @@ plt.show()
 
 # no clear seasonal effect
 
-# plot sample acf of feel
-fig, ax = plt.subplots(figsize=(10,6))
-plot_acf(df['feel'], ax=ax, lags=50)
+# plot sample acf, pacf of feel
+fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(6, 8))
+plot_acf(df['feel'], ax=ax1, lags=50, title = 'ACF')
+plot_pacf(df['feel'], ax=ax2, lags=50, title = 'Partial ACF')
+plt.tight_layout()
 plt.show()
 
 # some persistency in the time series
 
-# box plots of features
-features = ['feel', 'moving_time', 'rpe']
+# box plots of variables
+variables = ['feel', 'moving_time', 'rpe']
 
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15,6))
-for ax, feature in zip(axes, features):
-    ax.boxplot(df[feature], vert=True)
-    ax.set_title(feature)
+for ax, var in zip(axes, variables):
+    ax.boxplot(df[var], vert=True)
+    ax.set_title(var)
     ax.set_xticks([])
 
-fig.suptitle('Box-and-whisker plots of features (note: non-iid obs)')
+fig.suptitle('Box-and-whisker plots of response and features (note: non-iid obs)')
 
 plt.tight_layout()
 plt.show()
+
+# scatterplots
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
+
+for ax, var in zip(axes, variables[-2:]):
+    ax.scatter(df[var], df['feel'])
+    ax.set_xlabel(var)
+    ax.set_ylabel('feel')
+
+plt.tight_layout()
+plt.show()
+
+# kendall's tau
+for var in variables[-2:]:
+    tau, p_val = kendalltau(df[var], df['feel'])
+    print(f'Variable: {var}\nKendall\'s tau: {tau:.2f}\np-value={p_val:.2f}\n---')
+
