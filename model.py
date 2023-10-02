@@ -3,6 +3,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import q_stat
+from statsmodels.tsa.api import acf
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,6 +14,19 @@ df = pd.read_csv('activities.csv', parse_dates=['start_date_local'])
 df.set_index('start_date_local', inplace=True)
 df.rename(columns={'icu_rpe':'rpe'}, inplace=True)
 df.head()
+
+# ADF test, Ljung-Box test
+result_adf = adfuller(df['feel'])
+print('# of lags:', result_adf[2])
+print('p-value:', result_adf[1])
+
+# reject that there's a unit root, conclude time series is stationary
+
+acf_vals = acf(df['feel'])
+result_lb = q_stat(acf_vals, len(df['feel']))
+print('p-value:', result_lb[1][-1])
+
+# reject that the time series is white noise (iid)
 
 # model 1: linear least squares model
 X = df[['moving_time', 'rpe']]
@@ -33,25 +49,23 @@ plt.show()
 # some deviations from normality in the tails; no significant autocorrelations
 
 # out-of-sample model evalution with expanding-window approach and RMSE 
-train_size = int(len(df['feel']) * 0.7)
-train_data = df['feel'][:train_size].tolist()
-test_data = df['feel'][train_size:].tolist()
+def compute_rmse(errors):
+    """compute the root mean square error"""
+    return np.sqrt(np.mean(np.square(errors)))
 
-predictions = []
+def expanding_window_forecast(y, start_point, horizon=1):
+    """compute expanding-window residuals of h-step ahead predictions"""
+    errors = []
+    for i in range(start_point, len(y)-horizon):
+        model = sm.tsa.ARIMA(y.iloc(:i+1), order=(1,0,1)).fit()
+        predicted_value = model.forecast(steps=horizon)[0][-1]
+        errors.append(y.iloc[i+horizon]-predicted_value)
+    return errors
 
-for i in range(0, len(test_data), 5):
-    combined_data = train_data[i:]
-    model = sm.tsa.ARIMA(combined_data, order=(1,0,1))
-    model_fit = model.fit()
-    
-    steps_to_forecast = min(5, len(test_data)-i)
-    predicted = model_fit.forecast(steps=steps_to_forecast)[0]
+y = pd.Series(df['feel'])
 
-    if not isinstance(predicted, (list, np.ndarray)):
-        predicted = [predicted]
+start_point = round(0.75*len(y))
+errors = expanding_window_forecast(y, start_point)
+rmse = compute_rmse(errors)
 
-    predictions.extend(predicted)
-
-m2_rmse = np.sqrt(mean_squared_error(test_data, predictions))
-print(f"Root Mean Squared Error (RMSE): {m2_rmse:.2f}")
-
+print(rmse)
