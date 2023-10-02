@@ -14,14 +14,11 @@ response = requests.get(BASE_URL, params=PARAMS, auth=('API_KEY', API_KEY))
 
 # check for successful response
 if response.status_code == 200:
-    # convert the json response to a pandas dataframe
     df = pd.DataFrame(response.json())
 
-    # display basic dataframe info
     print(df.shape)
     print(df.head())
 
-    # save the dataframe to a csv file
     df.to_csv('activities.csv', index=False)
 else:
     print(f"failed to fetch data. HTTP status code: {response.status_code}")
