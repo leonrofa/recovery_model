@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from scipy.stats import kendalltau
 
 # function definition
 def find_outliers(column):
@@ -35,6 +34,7 @@ plt.figure(figsize=(10,2))
 plt.plot(df['feel'])
 plt.grid(True)
 plt.tight_layout()
+plt.savefig('figures/feel_original.pdf', format='pdf')
 plt.show()
 
 # process and plot 'feel' time series by day of the week
@@ -51,6 +51,7 @@ plt.xlabel('Day of the week')
 plt.ylabel('Feel (1: strong––5: weak)')
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.tight_layout()
+plt.savefig('figures/seasonal_effect.pdf', format='pdf')
 plt.show()
 
 # plot ACF and PACF
@@ -59,4 +60,5 @@ feel_clean = df['feel'].dropna()
 plot_acf(feel_clean, ax=ax1, lags=50)
 plot_pacf(feel_clean, ax=ax2, lags=50)
 plt.tight_layout()
+plt.savefig('figures/correlations.pdf', format='pdf')
 plt.show()
