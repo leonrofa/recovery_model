@@ -29,10 +29,11 @@ univariate_df = df.loc[df['type'].isin(['Elliptical', 'Run']), 'feel']
 univariate_df = univariate_df.resample('D').mean().interpolate(method='linear')
 
 # plot time series
-plt.figure(figsize=(12,4))
+plt.figure(figsize=(10,2))
 plt.plot(univariate_df)
 plt.grid(True)
 plt.tight_layout()
+plt.savefig('figures/feel_processed.pdf', format='pdf')
 plt.show()
 
 # adf and ljung-box tests
