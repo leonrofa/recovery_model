@@ -52,10 +52,12 @@ print('p-value:', result_lb[1][-1])
 # autoregressive model for univariate time series
 m1 = sm.tsa.ARIMA(univariate_df, order=(1,0,1))
 m1_result = m1.fit()
+print(m1_result.summary())
 
 # plot residuals for model diagnostics
 fig = m1_result.plot_diagnostics(figsize=(12, 8))
 plt.tight_layout()
+plt.savefig('figures/residuals.pdf', format='pdf')
 plt.show()
 
 # some deviations from normality in the tails; no significant autocorrelations
